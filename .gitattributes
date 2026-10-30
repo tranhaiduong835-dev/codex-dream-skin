@@ -9,16 +9,16 @@
 # Release-reviewed build inputs are hashed byte-for-byte.
 macos/presets/preset-gothic-void-crusade/theme.json text eol=lf
 windows/presets/preset-gothic-void-crusade/theme.json text eol=lf
-windows/installer/languages/ChineseSimplified.isl text eol=lf
-windows/installer/languages/Inno-Setup-License.txt text eol=lf
+windows/installer/ChineseSimplified.isl text eol=lf
+windows/installer/Inno-Setup-License.txt text eol=lf
 
 # sync-runtime-assets.mjs compares generated content to what is on disk byte
 # for byte, and it emits LF. A CRLF checkout would make --check fail on Windows
 # for files nobody edited, so the shared runtime source and everything compiled
 # from it stay LF on every platform -- sources included, not just outputs.
 runtime/** text eol=lf
-tools/selectors.json text eol=lf
-tools/windows-shell.css text eol=lf
+windows/assets/selectors.json text eol=lf
+windows/assets/windows-shell.css text eol=lf
 macos/assets/** text eol=lf
 windows/assets/** text eol=lf
 macos/scripts/image-metadata.mjs text eol=lf

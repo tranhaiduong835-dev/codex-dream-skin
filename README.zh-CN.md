@@ -10,12 +10,12 @@
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey)](https://github.com/Fei-Away/Codex-Dream-Skin/releases/latest)
 [![Stars](https://img.shields.io/github/stars/Fei-Away/Codex-Dream-Skin?label=stars&color=blue)](https://github.com/Fei-Away/Codex-Dream-Skin/stargazers)
 [![Downloads](https://img.shields.io/github/downloads/Fei-Away/Codex-Dream-Skin/total?label=downloads)](https://github.com/Fei-Away/Codex-Dream-Skin/releases)
-[![License](https://img.shields.io/github/license/Fei-Away/Codex-Dream-Skin?label=license)](./macos/LICENSE)
+[![License](https://img.shields.io/github/license/Fei-Away/Codex-Dream-Skin?label=license)](./LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/Fei-Away/Codex-Dream-Skin/ci.yml?label=CI)](https://github.com/Fei-Away/Codex-Dream-Skin/actions/workflows/ci.yml)
 
 <a href="https://trendshift.io/repositories/84043?utm_source=trendshift-badge&utm_medium=badge&utm_campaign=badge-trendshift-84043" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/84043/daily" alt="Fei-Away%2FCodex-Dream-Skin | Trendshift" width="250" height="55"/></a>
 
-[English](README.md) | 中文 | [更新日志](https://github.com/Fei-Away/Codex-Dream-Skin/releases)
+[English](README.en.md) | 中文 | [更新日志](https://github.com/Fei-Away/Codex-Dream-Skin/releases)
 
 **[安装](#安装) · [主题库](#主题库与社区) · [它能做什么](#它能做什么) · [导入主题](#导入主题-zip) · [开发者](#开发者) · [安全边界](#安全边界)**
 
@@ -191,9 +191,9 @@ macOS 菜单栏和 Windows 托盘都有「主题库 Gallery」和「在线 Studi
 | 平台 | 目录 | 入口 |
 |---|---|---|
 | Apple Silicon / Intel Mac | [`macos/`](./macos/) | 双击 `Install Codex Dream Skin.command` |
-| Windows | [`windows/`](./windows/) | `scripts/install-dream-skin.ps1` → `start-dream-skin.ps1` |
+| Windows | [`windows/`](./windows/) | `windows/scripts/install-dream-skin.ps1` → `windows/scripts/start-dream-skin.ps1` |
 
-- Mac：[`macos/README.md`](./macos/README.md) · Windows：[`windows/README.md`](./windows/README.md)（[英文版](./windows/README.en.md)）
+- Mac：[`macos/README.md`](./macos/README.md) · Windows：[`README.zh-CN.md`](./README.zh-CN.md)（[英文版](./README.en.md)）
 - 路径对照：[`docs/platforms.md`](./docs/platforms.md)
 - 可直接复制的参考生图模板：[`docs/reference-background-prompt-guide.md`](./docs/reference-background-prompt-guide.md) · 八种概念方向详细提示词：[`docs/background-generation-prompts.md`](./docs/background-generation-prompts.md)
 - 项目记录：[`docs/PROJECT.md`](./docs/PROJECT.md)
@@ -213,7 +213,7 @@ macOS 菜单栏和 Windows 托盘都有「主题库 Gallery」和「在线 Studi
 
 ## 许可与声明
 
-- 见 [`macos/LICENSE`](./macos/LICENSE)（MIT）与 [`macos/NOTICE.md`](./macos/NOTICE.md)
+- 见 [`LICENSE`](./LICENSE)（MIT）与 [`macos/NOTICE.md`](./macos/NOTICE.md)
 - 非 OpenAI 官方产品；Codex 及相关权利归其权利人
 - 随仓库预设及效果图中的人物 / IP 素材仅作主题示意；商用或公开再分发请自行确认肖像、素材与商标权利
 

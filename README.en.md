@@ -1,7 +1,7 @@
 # Codex Dream Skin for Windows
 
 <p align="center">
-  <a href="./README.md">中文</a> · <strong>English</strong>
+  <a href="./README.zh-CN.md">中文</a> · <strong>English</strong>
 </p>
 
 Codex Dream Skin loads an external theme into the official Codex Windows desktop app through loopback CDP. The native sidebar, project picker, task content, and composer remain interactive. The tool does not modify WindowsApps, `app.asar`, or the app signature.
@@ -81,7 +81,7 @@ The verification script confirms:
 - The decorative skin layer does not intercept pointer events.
 - When the current route is home, the themed home structure has loaded.
 
-Next, use the generated screenshot to check horizontal overflow and text contrast. On both the home and normal task routes, manually check the project menu and composer interaction. See [`references/qa-inventory.md`](./references/qa-inventory.md) for the complete visual checklist.
+Next, use the generated screenshot to check horizontal overflow and text contrast. On both the home and normal task routes, manually check the project menu and composer interaction. See [`tests/qa-inventory.md`](./tests/qa-inventory.md) for the complete visual checklist.
 
 ## Change and save themes
 
@@ -218,6 +218,6 @@ Open the repository's [new issue page](https://github.com/Fei-Away/Codex-Dream-S
 - The tool does not modify the official Codex installation, WindowsApps, `app.asar`, or signatures.
 - It does not write API keys, Base URLs, or model provider settings.
 - Restore controls only Codex processes that pass package identity, executable path, and recorded session checks.
-- See [`../SECURITY.md`](../SECURITY.md) for the complete threat model and operating guidance.
+- See [`./SECURITY.md`](./SECURITY.md) for the complete threat model and operating guidance.
 
-Maintainer and agent constraints live in [`SKILL.md`](./SKILL.md). See [`references/runtime-notes.md`](./references/runtime-notes.md) for deeper runtime troubleshooting.
+Maintainer and agent constraints live in [`SKILL.md`](./SKILL.md). See [`tests/runtime-notes.md`](./tests/runtime-notes.md) for deeper runtime troubleshooting.

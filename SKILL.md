@@ -9,13 +9,13 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 
 ## Workflow
 
-1. Install Node.js 22 or newer, close Codex, then run `scripts/install-dream-skin.ps1` once. The installer preserves the user's native appearance settings, seeds the Arina Hashimoto theme, copies the runtime to `%LOCALAPPDATA%\CodexDreamSkin\engine`, and creates launch/restore/tray shortcuts that do not depend on the source checkout.
+1. Install Node.js 22 or newer, close Codex, then run `windows/scripts/install-dream-skin.ps1` once. The installer preserves the user's native appearance settings, seeds the Arina Hashimoto theme, copies the runtime to `%LOCALAPPDATA%\CodexDreamSkin\engine`, and creates launch/restore/tray shortcuts that do not depend on the source checkout.
 2. Use the `Codex Dream Skin` shortcut, or run `%LOCALAPPDATA%\CodexDreamSkin\engine\scripts\start-dream-skin.ps1`. The shortcut asks before restarting an already-open Codex app; CLI callers must explicitly add `-RestartExisting`.
-3. Run `scripts/verify-dream-skin.ps1 -ScreenshotPath <absolute-path>` after launch. Treat a missing continuous wallpaper, home shell, native composer, sidebar layer, or injection marker as failure. The native suggestion count is responsive and may be two to four.
+3. Run `windows/scripts/verify-dream-skin.ps1 -ScreenshotPath <absolute-path>` after launch. Treat a missing continuous wallpaper, home shell, native composer, sidebar layer, or injection marker as failure. The native suggestion count is responsive and may be two to four.
 4. To add a complete downloaded pack, use the tray's “导入主题 ZIP…”. Accept ordinary `.zip` only. Every new official Studio pack contains `manifest.json`, non-empty `theme.json`, non-empty locally validated `theme.css`, exactly one registered background, and optional license/signature files; the trusted local simplified format contains exactly `theme.json`, `theme.css`, and its referenced image. Import into saved themes without changing the active theme. A manually extracted complete three-file directory may instead be moved into the saved themes folder. Previously saved legacy themes without CSS remain switchable but inject no extra CSS.
 5. A compatible DreamSkin.cc theme can use the exact `dreamskin://apply?version=ver_...` link registered by Setup.exe. The handler always obtains approved metadata and the ZIP from the fixed API, requires `applyCompatible: true`, shows a native confirmation, verifies byte count and SHA-256, then reuses the strict importer before applying. It never accepts an arbitrary URL/path/command or a silent-apply flag.
-6. Inspect the screenshot against `references/qa-inventory.md`. Verify both the home screen and a normal task before signing off.
-7. Run `scripts/restore-dream-skin.ps1` to remove the live skin, close the saved CDP session, and reopen Codex normally. Add `-RestoreBaseTheme` to restore only saved appearance keys, `-RecoverConfigBackup` for explicit byte-for-byte recovery of a damaged config, or `-Uninstall` to delete shortcuts. A completed config restore archives that install's backup so a later install captures a fresh baseline.
+6. Inspect the screenshot against `tests/qa-inventory.md`. Verify both the home screen and a normal task before signing off.
+7. Run `windows/scripts/restore-dream-skin.ps1` to remove the live skin, close the saved CDP session, and reopen Codex normally. Add `-RestoreBaseTheme` to restore only saved appearance keys, `-RecoverConfigBackup` for explicit byte-for-byte recovery of a damaged config, or `-Uninstall` to delete shortcuts. A completed config restore archives that install's backup so a later install captures a fresh baseline.
 
 ## Guardrails
 
@@ -45,22 +45,22 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 
 ```powershell
 powershell -NoProfile -File tests\run-tests.ps1
-node --check scripts\injector.mjs
-node --check assets\renderer-inject.js
+node --check windows\scripts\injector.mjs
+node --check windows\assets\renderer-inject.js
 ```
 
 ## Resources
 
-- `scripts/injector.mjs`: CDP connection, renderer injection, verification, screenshot, and removal.
-- `scripts/common-windows.ps1`: Store-package discovery, Node validation, managed runtime installation, port ownership, state, and process identity safety.
-- `scripts/config-utf8.ps1`: atomic UTF-8 configuration backup, selective restore, and explicit recovery.
-- `assets/dream-skin.css`: full visual layer.
-- `assets/renderer-inject.js`: idempotent DOM integration and cleanup.
-- `assets/dream-reference.jpg`: pure 2560 × 1440 Arina Hashimoto wallpaper seeded as the default and as a saved theme; it contains no Codex UI.
-- `assets/theme.json`: shared adaptive theme contract for the seeded preset.
-- `scripts/theme-windows.ps1`: persistent active/saved theme store, safe image import, pause state, and preset seeding.
-- `scripts/apply-community-theme.ps1`: fixed-origin, confirmed community download, integrity verification, strict ZIP import, apply, and rollback orchestration.
-- `scripts/tray-dream-skin.ps1`: Windows Forms tray for apply, pause, import, save, switch, and complete restore.
-- `references/qa-inventory.md`: required functional and visual signoff coverage.
-- `references/runtime-notes.md`: troubleshooting and update behavior.
+- `windows/scripts/injector.mjs`: CDP connection, renderer injection, verification, screenshot, and removal.
+- `windows/scripts/common-windows.ps1`: Store-package discovery, Node validation, managed runtime installation, port ownership, state, and process identity safety.
+- `windows/scripts/config-utf8.ps1`: atomic UTF-8 configuration backup, selective restore, and explicit recovery.
+- `windows/assets/dream-skin.css`: full visual layer.
+- `windows/assets/renderer-inject.js`: idempotent DOM integration and cleanup.
+- `windows/assets/dream-reference.jpg`: pure 2560 × 1440 Arina Hashimoto wallpaper seeded as the default and as a saved theme; it contains no Codex UI.
+- `windows/assets/theme.json`: shared adaptive theme contract for the seeded preset.
+- `windows/scripts/theme-windows.ps1`: persistent active/saved theme store, safe image import, pause state, and preset seeding.
+- `windows/scripts/apply-community-theme.ps1`: fixed-origin, confirmed community download, integrity verification, strict ZIP import, apply, and rollback orchestration.
+- `windows/scripts/tray-dream-skin.ps1`: Windows Forms tray for apply, pause, import, save, switch, and complete restore.
+- `tests/qa-inventory.md`: required functional and visual signoff coverage.
+- `tests/runtime-notes.md`: troubleshooting and update behavior.
 - `tests/run-tests.ps1`: managed runtime, configuration, state, recovery, payload, and CDP validation regression checks. Use `-EngineOnly` for the source-independence contract.
