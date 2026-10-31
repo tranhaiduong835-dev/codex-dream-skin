@@ -9,7 +9,7 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 
 ## Workflow
 
-1. From the repository root, check for the registered `OpenAI.Codex` Store package and Node.js 22 or newer. This checkout lacks `windows/presets/preset-gothic-void-crusade/` and a complete .NET app entry point: do not claim that source installation or release packaging works. Once those inputs are restored, run `node .\tools\build-theme-manager.mjs`; confirm it produced `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`. Close Codex and the tray, then run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\install-dream-skin.ps1`. A successful installer preserves native appearance settings, seeds the Gothic Void Crusade theme, copies the runtime to `%LOCALAPPDATA%\CodexDreamSkin\engine`, and creates source-independent shortcuts.
+1. From the repository root, check for the registered `OpenAI.Codex` Store package and Node.js 22 or newer. A separate `windows/presets/` source tree is not needed: the Gothic preset is seeded from Windows assets. This checkout still lacks a complete .NET app entry point and its published manager executable; the CSS/renderer assets contain uncompiled tokens and the image-metadata CLI is absent. Do not claim that installation or release packaging works. `node .\tools\sync-runtime-assets.mjs --check` is a read-only preflight that reports these gaps; never run the tool in write mode while canonical sources are absent. Once the inputs are restored and preflight passes, run `node .\tools\build-theme-manager.mjs`; confirm it produced `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`. Close Codex and the tray, then run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\install-dream-skin.ps1`. A successful installer preserves native appearance settings, seeds the Gothic Void Crusade theme, copies the runtime to `%LOCALAPPDATA%\CodexDreamSkin\engine`, and creates source-independent shortcuts.
 2. After a successful installation, use the `Codex Dream Skin` shortcut, or run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\start-dream-skin.ps1 -PromptRestart` from the repository root. The installed copy is `%LOCALAPPDATA%\CodexDreamSkin\engine\scripts\start-dream-skin.ps1`. CLI callers can use `-RestartExisting` only when an unattended restart is intended.
 3. After launch, run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\verify-dream-skin.ps1 -ScreenshotPath <absolute-path>` from the repository root. Treat a missing continuous wallpaper, home shell, native composer, sidebar layer, or injection marker as failure. The native suggestion count is responsive and may be two to four.
 4. To add a complete downloaded pack, use the tray's “导入主题 ZIP…”. Accept ordinary `.zip` only. Every new official Studio pack contains `manifest.json`, non-empty `theme.json`, non-empty locally validated `theme.css`, exactly one registered background, and optional license/signature files; the trusted local simplified format contains exactly `theme.json`, `theme.css`, and its referenced image. Import into saved themes without changing the active theme. A manually extracted complete three-file directory may instead be moved into the saved themes folder. Previously saved legacy themes without CSS remain switchable but inject no extra CSS.
@@ -44,6 +44,7 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 ## Checks
 
 ```powershell
+node .\tools\sync-runtime-assets.mjs --check
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\tests\run-tests.ps1
 node --check .\windows\scripts\injector.mjs
 node --check .\windows\assets\renderer-inject.js
@@ -61,9 +62,10 @@ node --check .\windows\assets\renderer-inject.js
 - `windows/scripts/apply-community-theme.ps1`: fixed-origin, confirmed community download, integrity verification, strict ZIP import, apply, and rollback orchestration.
 - `windows/scripts/tray-dream-skin.ps1`: Windows Forms tray for apply, pause, import, save, switch, and complete restore.
 - `tools/build-theme-manager.mjs`: publishes the native manager into `windows/assets/theme-manager/` when its .NET source is complete.
+- `tools/sync-runtime-assets.mjs --check`: read-only Windows asset preflight; write mode is disabled without canonical sources.
 - `windows/installer/build-release.ps1` and `windows/installer/codex-dream-skin.iss`: release packaging inputs; the current checkout lacks their complete prerequisite assets.
 - `tests/qa-inventory.md`: required functional and visual signoff coverage.
 - `tests/runtime-notes.md`: troubleshooting and update behavior.
 - `tests/run-tests.ps1`: managed runtime, configuration, state, recovery, payload, and CDP validation regression checks. Use `-EngineOnly` for the source-independence contract.
 
-The full PowerShell runner currently stops on missing `windows/presets/`; report this limitation rather than treating the check as passed. Read [README.md](README.md) for the checkout status and [SECURITY.md](SECURITY.md) for CDP exposure details.
+The full PowerShell runner still contains a stale fixture that copies missing `windows/presets/`; this is not a source-install requirement. Report the test limitation rather than treating it as passed. Read [README.md](README.md) for the checkout status and [SECURITY.md](SECURITY.md) for CDP exposure details.

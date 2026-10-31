@@ -114,6 +114,7 @@ try {
   $backupExists = Test-Path -LiteralPath (Join-Path $stateRoot 'config.before-dream-skin.toml') -PathType Leaf
   $requiredEngineFiles = @(
     'VERSION',
+    'assets\background.jpg',
     'assets\codex-dream-skin.ico',
     'assets\dream-reference.jpg',
     'assets\dream-skin.css',

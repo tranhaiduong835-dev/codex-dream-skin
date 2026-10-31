@@ -18,21 +18,16 @@ $manifestPath = Join-Path $windowsRoot 'assets\node-runtime.json'
 $definitionPath = Join-Path $installerRoot 'codex-dream-skin.iss'
 $bootstrapPath = Join-Path $installerRoot 'setup-bootstrap.ps1'
 $versionPath = Join-Path $repositoryRoot 'VERSION'
-$macosVersionPath = Join-Path (Join-Path $repositoryRoot 'macos') 'VERSION'
-$macosPackagePath = Join-Path (Join-Path $repositoryRoot 'macos') 'package.json'
 $licensePath = Join-Path $repositoryRoot 'LICENSE'
-$noticePath = Join-Path (Join-Path $repositoryRoot 'macos') 'NOTICE.md'
 $innoLanguageRoot = $installerRoot
 $innoChineseLanguagePath = Join-Path $innoLanguageRoot 'ChineseSimplified.isl'
 $innoSetupLicensePath = Join-Path $innoLanguageRoot 'Inno-Setup-License.txt'
 $innoChineseLanguageSha256 = '7d544b9bb1d142cfa11f2e5d3cc8abe2e55f8e066c5124e3772675aa236e1278'
 $innoSetupLicenseSha256 = '0c81595601bce47eeef8d865d5da7f9ca2c6a12235b7482b29f5ab23ed02ee5a'
-$publicPresetRoot = Join-Path (Join-Path (Join-Path $repositoryRoot 'macos') 'presets') `
-  'preset-gothic-void-crusade'
-$publicPresetImagePath = Join-Path $publicPresetRoot 'background.jpg'
-$publicPresetThemePath = Join-Path $publicPresetRoot 'theme.json'
+$publicPresetImagePath = Join-Path $windowsRoot 'assets\background.jpg'
+$publicPresetThemePath = Join-Path $windowsRoot 'assets\theme.json'
 $publicPresetImageSha256 = 'b76a7cbe2ff9d923846e931984d243a7ba1f25de8d190b5c6412c809c41aee42'
-$publicPresetThemeSha256 = '8316c6ad29e3b84806358ab4a730c7e063b261e379179b9608cf751c282d66a7'
+$publicPresetThemeSha256 = '8ca4c866a85b7bcc2a493b0ee73c48d0f44135f46af036f47c002d1de0e9162f'
 
 function Read-ReleaseTextFile {
   param([Parameter(Mandatory = $true)][string]$Path)
@@ -265,18 +260,11 @@ $version = (Read-ReleaseTextFile -Path $versionPath).Trim()
 if ($version -cnotmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') {
   throw "VERSION must contain a three-part semantic version: $version"
 }
-$macosVersion = (Read-ReleaseTextFile -Path $macosVersionPath).Trim()
-$macosPackage = (Read-ReleaseTextFile -Path $macosPackagePath) | ConvertFrom-Json
-if ($macosVersion -cne $version -or "$($macosPackage.version)" -cne $version) {
-  throw "Release versions differ: windows=$version macOS=$macosVersion package=$($macosPackage.version)"
-}
-
 $manifest = (Read-ReleaseTextFile -Path $manifestPath) | ConvertFrom-Json
 Assert-NodeRuntimeManifest -Manifest $manifest
 $null = Read-ReleaseTextFile -Path $definitionPath
 $null = Read-ReleaseTextFile -Path $bootstrapPath
 $null = Read-ReleaseTextFile -Path $licensePath
-$null = Read-ReleaseTextFile -Path $noticePath
 $null = Read-ReleaseTextFile -Path $innoChineseLanguagePath
 $null = Read-ReleaseTextFile -Path $innoSetupLicensePath
 $innoChineseLanguageHash = (Get-FileHash -LiteralPath $innoChineseLanguagePath -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -354,8 +342,10 @@ try {
   New-Item -ItemType Directory -Path $languageRoot | Out-Null
   Copy-ReleaseDirectory -Source (Join-Path $windowsRoot 'assets') -Destination (Join-Path $payloadRoot 'assets')
   Copy-ReleaseDirectory -Source (Join-Path $windowsRoot 'scripts') -Destination (Join-Path $payloadRoot 'scripts')
-  Copy-ReleaseDirectory -Source $publicPresetRoot `
-    -Destination (Join-Path $payloadRoot 'presets\preset-gothic-void-crusade')
+  $stagedPresetRoot = Join-Path $payloadRoot 'presets\preset-gothic-void-crusade'
+  New-Item -ItemType Directory -Path $stagedPresetRoot -Force | Out-Null
+  Copy-Item -LiteralPath $publicPresetImagePath -Destination (Join-Path $stagedPresetRoot 'background.jpg') -Force
+  Copy-Item -LiteralPath $publicPresetThemePath -Destination (Join-Path $stagedPresetRoot 'theme.json') -Force
   Copy-Item -LiteralPath $publicPresetImagePath `
     -Destination (Join-Path (Join-Path $payloadRoot 'assets') 'dream-reference.jpg') -Force
   $publicPresetTheme.image = 'dream-reference.jpg'
@@ -371,7 +361,6 @@ try {
   )
   Copy-Item -LiteralPath $bootstrapPath -Destination (Join-Path $stageRoot 'setup-bootstrap.ps1') -Force
   Copy-Item -LiteralPath $licensePath -Destination (Join-Path $stageRoot 'LICENSE.txt') -Force
-  Copy-Item -LiteralPath $noticePath -Destination (Join-Path $stageRoot 'NOTICE.md') -Force
   Copy-Item -LiteralPath $innoChineseLanguagePath `
     -Destination (Join-Path $languageRoot 'ChineseSimplified.isl') -Force
 
@@ -386,10 +375,19 @@ try {
   } finally {
     $zip.Dispose()
   }
+  $assetPreflight = Join-Path $repositoryRoot 'tools\sync-runtime-assets.mjs'
+  if (-not (Test-Path -LiteralPath $assetPreflight -PathType Leaf)) {
+    throw "Windows asset preflight is missing: $assetPreflight"
+  }
+  & (Join-Path $nodeRoot 'node.exe') $assetPreflight '--check'
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Windows asset preflight failed; no incomplete Setup.exe was built.'
+  }
   Write-DreamSkinIcon -Path (Join-Path (Join-Path $payloadRoot 'assets') 'codex-dream-skin.ico')
 
   $expectedPayloadFiles = @(
     'VERSION',
+    'assets\background.jpg',
     'assets\dream-reference.jpg',
     'assets\dream-skin.css',
     'assets\renderer-inject.js',

@@ -6,7 +6,7 @@ Codex Dream Skin is an unofficial Windows theme manager and renderer injector fo
 
 The native C#/.NET theme-manager source is in `windows/theme-manager/`. The tray and scripts manage the installed runtime under `%LOCALAPPDATA%\CodexDreamSkin`.
 
-> **Current checkout is source-only and incomplete.** The install script expects `windows/presets/preset-gothic-void-crusade/`, a published `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`, and other generated runtime inputs that are not present in this branch. The .NET app project also lacks an entry-point source file. Consequently, the build/install commands below describe the intended workflow, **not a verified installation from this checkout**. Do not bypass the missing-input checks or substitute arbitrary binaries. No complete Setup.exe is published by this fork here.
+> **Current checkout is source-only and incomplete.** The install script no longer needs a separate `windows/presets/` source directory: the Gothic preset is seeded from Windows assets. It still requires `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`; the .NET app project lacks an entry-point source file. Windows CSS and renderer assets retain uncompiled tokens, and the image-metadata CLI is absent. Consequently, the build/install commands below describe the intended workflow, **not a verified installation from this checkout**. Do not bypass the missing-input checks or substitute arbitrary binaries. No complete Setup.exe is published by this fork here.
 
 ## Requirements
 
@@ -14,11 +14,11 @@ The native C#/.NET theme-manager source is in `windows/theme-manager/`. The tray
 - The official Microsoft Store `OpenAI.Codex` package installed and registered for the current user. Check with `Get-AppxPackage -Name OpenAI.Codex`.
 - Node.js 22 or newer on `PATH` for source-based use. A complete packaged installer would bundle its pinned Node runtime.
 - .NET SDK 8 or newer only to build the native manager; Inno Setup 6 only to build a Setup.exe.
-- A complete set of the missing preset, manager, and generated runtime assets before attempting source installation.
+- A built manager executable and fully compiled Windows runtime assets before attempting source installation.
 
 ## Install from source
 
-Run commands from the repository root in PowerShell. Close Codex and exit any Dream Skin tray process first. Once the missing source/release inputs have been restored and the manager project builds, publish the manager and run the installer:
+Run commands from the repository root in PowerShell. Close Codex and exit any Dream Skin tray process first. `node .\tools\sync-runtime-assets.mjs --check` is a read-only Windows asset preflight; write mode is deliberately disabled while canonical sources are absent. Once the missing inputs have been restored, the assets pass preflight, and the manager project builds, publish the manager and run the installer:
 
 ```powershell
 node .\tools\build-theme-manager.mjs
@@ -69,6 +69,6 @@ node --check .\windows\assets\renderer-inject.js
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\tests\run-tests.ps1
 ```
 
-The full PowerShell runner currently stops on the missing `windows/presets/` directory; this is a known repository-input gap, not a passing test run. The .NET manager tests require the SDK and complete project sources. Do not report a successful build or installation until those inputs and the runtime checks are verified.
+The full PowerShell runner still has a stale fixture that copies the missing `windows/presets/` directory; this is a test-suite gap, not a source-install requirement or a passing test run. The .NET manager tests require the SDK and complete project sources. Do not report a successful build or installation until those inputs and the runtime checks are verified.
 
 Licensed under [LICENSE](LICENSE). Codex and related marks belong to their owners; this is not an OpenAI product.

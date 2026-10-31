@@ -472,6 +472,7 @@ function Install-DreamSkinRuntimeEngine {
   $fullStateRoot = [System.IO.Path]::GetFullPath($StateRoot)
   $engine = Get-DreamSkinRuntimeEnginePaths -StateRoot $fullStateRoot
   $required = @(
+    'assets\background.jpg',
     'assets\dream-reference.jpg',
     'assets\dream-skin.css',
     'assets\renderer-inject.js',
@@ -480,8 +481,6 @@ function Install-DreamSkinRuntimeEngine {
     'assets\selectors.json',
     'assets\theme-package-validator.mjs',
     'assets\theme.json',
-    'presets\preset-gothic-void-crusade\background.jpg',
-    'presets\preset-gothic-void-crusade\theme.json',
     'scripts\apply-community-theme.ps1',
     'scripts\common-windows.ps1',
     'scripts\check-update.ps1',
@@ -508,7 +507,9 @@ function Install-DreamSkinRuntimeEngine {
       throw "Dream Skin runtime source is incomplete: $relative"
     }
   }
-  $sourceDirectories = @('assets', 'scripts', 'presets')
+  # The active and saved Gothic preset are seeded from assets/theme.json and
+  # assets/background.jpg; a separate source presets/ tree is not required.
+  $sourceDirectories = @('assets', 'scripts')
   if ($sourceHasBundledRuntime) {
     $sourceDirectories += 'runtime'
   }

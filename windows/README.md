@@ -2,9 +2,10 @@
 
 Run these commands in PowerShell from the [repository root](../README.md), not from `windows/`.
 
-The source install is currently **blocked by missing release inputs**: `windows/presets/preset-gothic-void-crusade/`, a complete .NET manager app project, and its published `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`. Do not use the install commands until those inputs are restored and verified.
+The source install is currently **blocked by missing release inputs**: a complete .NET manager app project and its published `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`. The Windows CSS/renderer assets are also uncompiled, and the image-metadata CLI is absent. A separate repository `windows/presets/` directory is no longer required. Do not use the install commands until the required inputs are restored and verified with the read-only asset check below.
 
 ```powershell
+node .\tools\sync-runtime-assets.mjs --check
 node .\tools\build-theme-manager.mjs
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\install-dream-skin.ps1
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\start-dream-skin.ps1 -PromptRestart

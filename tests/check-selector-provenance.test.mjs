@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import {
   SelectorProvenanceError,
   assertProvenanceMovedWithContract,
@@ -40,6 +42,28 @@ test("the committed contract satisfies its own provenance rules", async () => {
     verified.codexVersions.some((entry) => entry.evidence.startsWith("maintainer")),
     "at least one maintainer-verified build must remain on record",
   );
+});
+
+test("Windows asset sync refuses writes without canonical source files", async () => {
+  const tool = new URL("../tools/sync-runtime-assets.mjs", import.meta.url);
+  const css = new URL("../windows/assets/dream-skin.css", import.meta.url);
+  const before = await readFile(css);
+  const result = spawnSync(process.execPath, [fileURLToPath(tool)], { encoding: "utf8" });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /write mode disabled/i);
+  assert.deepEqual(await readFile(css), before);
+});
+
+test("Windows-only asset check reports Windows resource state without writing or reading missing platform sources", async () => {
+  const tool = new URL("../tools/sync-runtime-assets.mjs", import.meta.url);
+  const css = new URL("../windows/assets/dream-skin.css", import.meta.url);
+  const before = await readFile(css);
+  const result = spawnSync(process.execPath, [fileURLToPath(tool), "--check"], { encoding: "utf8" });
+  assert.ok(result.status === 0 || result.status === 1);
+  if (result.status === 0) assert.match(result.stdout, /Windows assets passed read-only preflight/);
+  else assert.match(result.stderr, /(?:uncompiled|missing-cli|missing-or-empty|invalid-json|invalid-contract|invalid-theme)=windows\//);
+  assert.doesNotMatch(result.stderr, /ENOENT.*(?:macos|runtime)/);
+  assert.deepEqual(await readFile(css), before);
 });
 
 test("a selector change without a provenance update is rejected", () => {
