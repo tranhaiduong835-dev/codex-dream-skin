@@ -48,7 +48,7 @@
 ## 实现与测试
 
 - 优先复用 `runtime/` 的共享源，通过现有同步工具生成双端资产；不要直接制造 macOS、Windows 漂移。
-- 版本发布必须同步 `macos/VERSION`、`windows/VERSION`、`macos/package.json`、`macos/scripts/common-macos.sh`、`macos/scripts/injector.mjs` 和 `windows/scripts/injector.mjs`，并更新绑定当前版本的断言。
+- 版本发布必须同步 `macos/VERSION`、`VERSION`、`macos/package.json`、`macos/scripts/common-macos.sh`、`macos/scripts/injector.mjs` 和 `windows/scripts/injector.mjs`，并更新绑定当前版本的断言。
 - 修改主题 schema、manifest、Safe CSS、导入或提取逻辑时，必须覆盖合法包、缺件、空文件、边界大小、哈希不符、路径攻击、链接、嵌套归档、压缩滥用、重复导入和 ID 冲突。
 - 修改共享 renderer 或 CSS 时，运行同步校验和双端 payload 检查；不得只验证一个平台副本。
 - macOS 相关改动至少运行适用的 Node、shell 语法和 Swift 测试；Windows 相关改动至少运行适用的 Node 与 PowerShell 测试。无法在本机执行的平台测试必须交给 CI 并明确说明。
