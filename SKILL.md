@@ -9,13 +9,13 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 
 ## Workflow
 
-1. Install Node.js 22 or newer, close Codex, then run `windows/scripts/install-dream-skin.ps1` once. The installer preserves the user's native appearance settings, seeds the Arina Hashimoto theme, copies the runtime to `%LOCALAPPDATA%\CodexDreamSkin\engine`, and creates launch/restore/tray shortcuts that do not depend on the source checkout.
-2. Use the `Codex Dream Skin` shortcut, or run `%LOCALAPPDATA%\CodexDreamSkin\engine\scripts\start-dream-skin.ps1`. The shortcut asks before restarting an already-open Codex app; CLI callers must explicitly add `-RestartExisting`.
-3. Run `windows/scripts/verify-dream-skin.ps1 -ScreenshotPath <absolute-path>` after launch. Treat a missing continuous wallpaper, home shell, native composer, sidebar layer, or injection marker as failure. The native suggestion count is responsive and may be two to four.
+1. From the repository root, check for the registered `OpenAI.Codex` Store package and Node.js 22 or newer. This checkout lacks `windows/presets/preset-gothic-void-crusade/` and a complete .NET app entry point: do not claim that source installation or release packaging works. Once those inputs are restored, run `node .\tools\build-theme-manager.mjs`; confirm it produced `windows/assets/theme-manager/DreamSkin.ThemeManager.exe`. Close Codex and the tray, then run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\install-dream-skin.ps1`. A successful installer preserves native appearance settings, seeds the Gothic Void Crusade theme, copies the runtime to `%LOCALAPPDATA%\CodexDreamSkin\engine`, and creates source-independent shortcuts.
+2. After a successful installation, use the `Codex Dream Skin` shortcut, or run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\start-dream-skin.ps1 -PromptRestart` from the repository root. The installed copy is `%LOCALAPPDATA%\CodexDreamSkin\engine\scripts\start-dream-skin.ps1`. CLI callers can use `-RestartExisting` only when an unattended restart is intended.
+3. After launch, run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\verify-dream-skin.ps1 -ScreenshotPath <absolute-path>` from the repository root. Treat a missing continuous wallpaper, home shell, native composer, sidebar layer, or injection marker as failure. The native suggestion count is responsive and may be two to four.
 4. To add a complete downloaded pack, use the tray's “导入主题 ZIP…”. Accept ordinary `.zip` only. Every new official Studio pack contains `manifest.json`, non-empty `theme.json`, non-empty locally validated `theme.css`, exactly one registered background, and optional license/signature files; the trusted local simplified format contains exactly `theme.json`, `theme.css`, and its referenced image. Import into saved themes without changing the active theme. A manually extracted complete three-file directory may instead be moved into the saved themes folder. Previously saved legacy themes without CSS remain switchable but inject no extra CSS.
 5. A compatible DreamSkin.cc theme can use the exact `dreamskin://apply?version=ver_...` link registered by Setup.exe. The handler always obtains approved metadata and the ZIP from the fixed API, requires `applyCompatible: true`, shows a native confirmation, verifies byte count and SHA-256, then reuses the strict importer before applying. It never accepts an arbitrary URL/path/command or a silent-apply flag.
 6. Inspect the screenshot against `tests/qa-inventory.md`. Verify both the home screen and a normal task before signing off.
-7. Run `windows/scripts/restore-dream-skin.ps1` to remove the live skin, close the saved CDP session, and reopen Codex normally. Add `-RestoreBaseTheme` to restore only saved appearance keys, `-RecoverConfigBackup` for explicit byte-for-byte recovery of a damaged config, or `-Uninstall` to delete shortcuts. A completed config restore archives that install's backup so a later install captures a fresh baseline.
+7. From the repository root, run `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\windows\scripts\restore-dream-skin.ps1 -RestoreBaseTheme -PromptRestart` to remove the live skin, close the saved CDP session, and restore saved appearance keys. Use `-RecoverConfigBackup` only for explicit byte-for-byte recovery of a damaged config, or `-Uninstall` to delete shortcuts. A completed config restore archives that install's backup so a later install captures a fresh baseline.
 
 ## Guardrails
 
@@ -26,7 +26,7 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 - Attach the "选择项目" treatment to Codex's real project-selector toolbar and keep the current project button clickable; never draw a disconnected replacement.
 - Keep decorative layers `pointer-events: none` and keep real buttons, navigation, and composer above them.
 - On app updates, rerun install and launch; the scripts discover the current Appx package dynamically. Saved paths are never trusted for process control unless they still match a registered package identity.
-- Keep manifest-derived package activation as the preferred Windows launch, and always pair remote-debugging switches with the persistent non-default managed CDP profile that Chromium 136+ requires. The exact Store `app\ChatGPT.exe` fallback is allowed only after visible process arguments prove owl encoded the CDP flag inside `codex://`, and only with the package identity/path checks in `common-windows.ps1`. Preserve the pre-launch PID set during rollback. Treat access denial and raw arguments without a verified listener as terminal. This fallback is diagnostic, not proof of owl compatibility; never change WindowsApps ACLs to make it run.
+- Keep manifest-derived package activation as the preferred Windows launch, and always pair remote-debugging switches with the persistent non-default managed CDP profile that Chromium 136+ requires. The exact Store `app\ChatGPT.exe` fallback is allowed only after visible process arguments prove owl encoded the CDP flag inside `codex://`, and only with the package identity/path checks in `windows/scripts/common-windows.ps1`. Preserve the pre-launch PID set during rollback. Treat access denial and raw arguments without a verified listener as terminal. This fallback is diagnostic, not proof of owl compatibility; never change WindowsApps ACLs to make it run.
 - The default launcher scans for a free port when `9335` is occupied. An explicitly requested occupied port fails closed.
 - Keep the injection daemon running for navigation/reload resilience. Its state and logs live under `%LOCALAPPDATA%\CodexDreamSkin`.
 - The watcher registers a generation-checked early payload for connected renderers so reload/navigation can paint the skin before the normal load-event fallback; unsupported CDP targets fall back safely.
@@ -37,16 +37,16 @@ Apply a reversible renderer skin through Chromium DevTools Protocol while launch
 - CDP targets must use a same-port loopback WebSocket, belong to the current Store package, retain the launch-time Browser ID, and expose expected Codex renderer markers.
 - Loopback prevents LAN exposure, but Chromium CDP has no same-user authentication. Run only trusted local software while the skin is active, and use restore to close the debug session when it is no longer needed.
 - Preserve `config.toml` as strict UTF-8. Never use encoding-dependent whole-file PowerShell reads/writes, silently transcode UTF-16, or overwrite a file that changed after it was read. Ambiguous TOML shapes must fail before writing rather than receive a best-effort rewrite.
-- Keep install/start/restore/verify serialized with the per-user operation lock in `common-windows.ps1`.
+- Keep install/start/restore/verify serialized with the per-user operation lock in `windows/scripts/common-windows.ps1`.
 - Treat `%LOCALAPPDATA%\CodexDreamSkin\engine` as an installer-managed runtime. Exit the Dream Skin tray before reinstalling so the installer can replace that runtime atomically and update every shortcut to the same copy.
 - Keep installed shortcuts and tray child processes on `RemoteSigned`, never `Bypass`. Clear Internet-zone markers only from staged managed `.ps1` copies after their byte-content hashes match the selected source; never change the user's persistent execution policy or override Group Policy.
 
 ## Checks
 
 ```powershell
-powershell -NoProfile -File tests\run-tests.ps1
-node --check windows\scripts\injector.mjs
-node --check windows\assets\renderer-inject.js
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\tests\run-tests.ps1
+node --check .\windows\scripts\injector.mjs
+node --check .\windows\assets\renderer-inject.js
 ```
 
 ## Resources
@@ -56,11 +56,14 @@ node --check windows\assets\renderer-inject.js
 - `windows/scripts/config-utf8.ps1`: atomic UTF-8 configuration backup, selective restore, and explicit recovery.
 - `windows/assets/dream-skin.css`: full visual layer.
 - `windows/assets/renderer-inject.js`: idempotent DOM integration and cleanup.
-- `windows/assets/dream-reference.jpg`: pure 2560 × 1440 Arina Hashimoto wallpaper seeded as the default and as a saved theme; it contains no Codex UI.
-- `windows/assets/theme.json`: shared adaptive theme contract for the seeded preset.
+- `windows/assets/background.jpg` and `windows/assets/theme.json`: bundled Gothic Void Crusade background and theme metadata used for the active and saved preset. The separate `dream-reference.jpg` is a reference image, not the preset background.
 - `windows/scripts/theme-windows.ps1`: persistent active/saved theme store, safe image import, pause state, and preset seeding.
 - `windows/scripts/apply-community-theme.ps1`: fixed-origin, confirmed community download, integrity verification, strict ZIP import, apply, and rollback orchestration.
 - `windows/scripts/tray-dream-skin.ps1`: Windows Forms tray for apply, pause, import, save, switch, and complete restore.
+- `tools/build-theme-manager.mjs`: publishes the native manager into `windows/assets/theme-manager/` when its .NET source is complete.
+- `windows/installer/build-release.ps1` and `windows/installer/codex-dream-skin.iss`: release packaging inputs; the current checkout lacks their complete prerequisite assets.
 - `tests/qa-inventory.md`: required functional and visual signoff coverage.
 - `tests/runtime-notes.md`: troubleshooting and update behavior.
 - `tests/run-tests.ps1`: managed runtime, configuration, state, recovery, payload, and CDP validation regression checks. Use `-EngineOnly` for the source-independence contract.
+
+The full PowerShell runner currently stops on missing `windows/presets/`; report this limitation rather than treating the check as passed. Read [README.md](README.md) for the checkout status and [SECURITY.md](SECURITY.md) for CDP exposure details.
